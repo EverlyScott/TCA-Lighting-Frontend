@@ -9,7 +9,7 @@ module.exports = {
       user: "tca",
       host: "10.0.0.1",
       ref: "origin/main",
-      repo: "https://github.com/EverlyScott/TCA-Lighting",
+      repo: "https://github.com/EverlyScott/TCA-Lighting-Frontend",
       path: "/var/TCA-Lighting-Frontend",
       "pre-deploy-local": "",
       "post-deploy":
