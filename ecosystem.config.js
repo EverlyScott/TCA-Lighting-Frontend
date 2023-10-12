@@ -21,7 +21,7 @@ module.exports = {
       host: [
         {
           host: "68.117.90.63",
-          port: 222,
+          port: "222",
         },
       ],
       ref: "origin/main",
