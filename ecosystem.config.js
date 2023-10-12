@@ -18,7 +18,8 @@ module.exports = {
     },
     productionRemote: {
       user: "tca",
-      host: "68.117.90.63:222",
+      host: "68.117.90.63",
+      port: 222,
       ref: "origin/main",
       repo: "https://github.com/EverlyScott/TCA-Lighting-Frontend",
       path: "/var/TCA-Lighting-Frontend",
