@@ -5,7 +5,7 @@ import CurrentSetControls from "./_currentSetControls";
 import TapBPM from "./_tapBPM";
 import SetsList from "./_setsList";
 import CurrentStatus from "$/CurrentStatus";
-import getGlobals from "../hooks/getGlobals";
+import getGlobals from "#/getGlobals";
 import CenterOfPage from "$/CenterOfPage";
 
 const Home: NextPage = async () => {

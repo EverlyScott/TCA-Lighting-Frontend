@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { metadata as homeMetadata } from "#/layout";
+import { metadata as homeMetadata } from "../../layout";
 import BasicLayout from "@/utils/BasicLayout";
 
 export const metadata: Metadata = {

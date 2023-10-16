@@ -14,7 +14,7 @@ import { NextPage } from "next";
 
 const Loading: NextPage = () => {
   return (
-    <>
+    <div style={{ maxWidth: 1000, width: "100%" }}>
       <Typography variant="h4" component="h2">
         Current Status
       </Typography>
@@ -28,11 +28,11 @@ const Loading: NextPage = () => {
           <Typography>Example Set Name</Typography>
         </Skeleton>
         <div style={{ display: "flex" }}>
-          <Button variant="contained" sx={{ borderTopRightRadius: 0, borderBottomRightRadius: 0 }}>
+          <Button variant="contained" disabled sx={{ borderTopRightRadius: 0, borderBottomRightRadius: 0 }}>
             Previous
           </Button>
           <Divider orientation="vertical" sx={{ margin: 0 }} />
-          <Button variant="contained" sx={{ borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }}>
+          <Button variant="contained" disabled sx={{ borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }}>
             Next
           </Button>
         </div>
@@ -43,14 +43,16 @@ const Loading: NextPage = () => {
         <Skeleton variant="text">
           <Typography>120 BPM</Typography>
         </Skeleton>
-        <Button variant="contained">Tap BPM</Button>
+        <Button variant="contained" disabled>
+          Tap BPM
+        </Button>
       </Paper>
       <Typography sx={{ marginTop: 2 }} variant="h4" component="h2">
         Sets
       </Typography>
       <Paper>
         <List>
-          {new Array(4).fill("").map((_, i) => {
+          {new Array(5).fill("").map((_, i) => {
             return (
               <ListItem key={i} disablePadding>
                 <ListItemButton>
@@ -70,7 +72,7 @@ const Loading: NextPage = () => {
           })}
         </List>
       </Paper>
-    </>
+    </div>
   );
 };
 

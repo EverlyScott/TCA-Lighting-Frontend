@@ -1,7 +1,7 @@
 "use client";
 
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from "@mui/material";
-import type { Set } from "../../src/types";
+import type { Set } from "@/types";
 import { useRouter } from "next/navigation";
 
 interface IProps {

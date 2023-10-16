@@ -1,7 +1,7 @@
 "use client";
 
 import { Button, Divider } from "@mui/material";
-import type { Set } from "../../src/types";
+import type { Set } from "@/types";
 
 interface IProps {
   currentSet: Set;

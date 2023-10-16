@@ -3,7 +3,7 @@
 import React from "react";
 import IconButton from "@mui/material/IconButton";
 import { DarkMode, LightMode } from "@mui/icons-material";
-import useColorScheme from "../../hooks/useColorScheme";
+import useColorScheme from "#/useColorScheme";
 
 export function ThemeToggle() {
   const [[theme, mode], setMode] = useColorScheme();

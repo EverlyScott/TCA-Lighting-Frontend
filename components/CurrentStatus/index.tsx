@@ -2,7 +2,7 @@
 
 import { Skeleton } from "@mui/material";
 import { useEffect, useState } from "react";
-import config from "../../../src/config.json";
+import config from "@/config.json";
 
 type Color = [number, number, number];
 

@@ -1,9 +1,12 @@
 import axios from "axios";
-import config from "../../src/config.json";
-import type GLOBALS from "../../src/globals";
+import config from "../src/config.json";
+import type GLOBALS from "../../TCA-Lighting/src/globals";
+import useCurrentHostname from "./useCurrentUrl";
 
 const getGlobals = async () => {
-  const globals = await axios.get<typeof GLOBALS>(`http://127.0.0.1:${config.api.port}/globals`);
+  const currentHostname = useCurrentHostname();
+
+  const globals = await axios.get<typeof GLOBALS>(`http://${currentHostname}:${config.api.port}/globals`);
 
   if (globals.status === 200) {
     return globals.data;
