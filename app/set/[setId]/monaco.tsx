@@ -26,7 +26,6 @@ const MonacoEditor: React.FC<IProps> = ({ value, setValue, initialLoad, setIniti
   const currentHostname = useCurrentHostname();
 
   const handleWindowResize = () => {
-    console.log("setting");
     setWindowWidth(document.body.clientWidth);
   };
 
