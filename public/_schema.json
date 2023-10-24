@@ -31,15 +31,12 @@
             "minItems": 3,
             "maxItems": 3
           },
-          "type": {
+          "length": {
             "type": "number",
             "minimum": 0
-          },
-          "dotted": {
-            "type": "boolean"
           }
         },
-        "required": ["rgb"]
+        "required": ["rgb", "length"]
       }
     }
   },

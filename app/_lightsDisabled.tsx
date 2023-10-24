@@ -1,29 +1,45 @@
 "use client";
 
+import useCurrentHostname from "#/useCurrentUrl";
+import { useToasts } from "@geist-ui/core";
 import { Typography, Button, Divider } from "@mui/material";
+import axios from "axios";
+import config from "@/config.json";
+import { useContext } from "react";
+import globalsContext from "../contexts/globals";
+import getGlobals from "#/getGlobals";
 
-interface IProps {
-  show: boolean;
-}
+const LightsDisabledMessage: React.FC = () => {
+  const { globals, setGlobals } = useContext(globalsContext);
+  const currentHostname = useCurrentHostname();
+  const { setToast } = useToasts();
 
-const LightsDisabledMessage: React.FC<IProps> = ({ show }) => {
-  const handleRestartLights = () => {};
+  const handleRestartLights = async () => {
+    try {
+      await axios.post(`http://${currentHostname}:${config.api.port}/restart-lights`);
+      const globals = await getGlobals();
+      setGlobals(globals);
+    } catch (err) {
+      setToast({
+        type: "error",
+        text: "Failed to restart lights!",
+      });
+    }
+  };
 
-  return (
-    <>
-      {show && (
-        <>
-          <Typography>
-            <strong>Lights have been disabled due to an issue!</strong>
-          </Typography>
-          <Button variant="contained" onClick={handleRestartLights}>
-            Restart
-          </Button>
-          <Divider sx={{ margin: "16px 0" }} />
-        </>
-      )}
-    </>
-  );
+  if (globals && globals.LIGHTS_STOPPED) {
+    return (
+      <>
+        <Typography>
+          <strong>Lights have been disabled due to an issue!</strong>
+        </Typography>
+        <Button variant="contained" onClick={handleRestartLights}>
+          Restart
+        </Button>
+        <Divider sx={{ margin: "16px 0" }} />
+      </>
+    );
+  }
 };
 
 export default LightsDisabledMessage;

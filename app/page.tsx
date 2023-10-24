@@ -1,44 +1,48 @@
 import { NextPage } from "next";
-import { Typography, Paper, Button, Divider } from "@mui/material";
+import { Typography, Paper, Divider } from "@mui/material";
 import LightsDisabledMessage from "./_lightsDisabled";
 import CurrentSetControls from "./_currentSetControls";
 import TapBPM from "./_tapBPM";
 import SetsList from "./_setsList";
-import CurrentStatus from "$/CurrentStatus";
+import CurrentStatus from "./_currentStatus";
 import getGlobals from "#/getGlobals";
-import CenterOfPage from "$/CenterOfPage";
+import CreateSet from "./_createSet";
+import { GlobalsProvider } from "../contexts/globals";
+import CurrentName from "./_currentName";
+import CurrentBPM from "./_currentBPM";
+import { WSProvider } from "../contexts/ws";
 
 const Home: NextPage = async () => {
   const globals = await getGlobals();
 
   return (
-    <CenterOfPage>
-      <Typography variant="h4" component="h2">
-        Current Status
-      </Typography>
-      <Paper sx={{ padding: "1rem" }}>
-        <CurrentStatus />
-        <Divider sx={{ margin: "16px 0" }} />
-        <LightsDisabledMessage show={globals.LIGHTS_STOPPED} />
-        <Typography variant="h5" component="h3">
-          Current Set
-        </Typography>
-        <Typography>{globals.SET.name}</Typography>
-        <CurrentSetControls currentSet={globals.SET} sets={globals.SETS} />
-        <Divider sx={{ margin: "16px 0" }} />
-        <Typography variant="h5" component="h3">
-          Current BPM
-        </Typography>
-        <Typography>{globals.BPM} BPM</Typography>
-        <TapBPM />
-      </Paper>
-      <Typography sx={{ marginTop: 2 }} variant="h4" component="h2">
-        Sets
-      </Typography>
-      <Paper>
-        <SetsList sets={globals.SETS} />
-      </Paper>
-    </CenterOfPage>
+    <GlobalsProvider initialValue={globals}>
+      <WSProvider>
+        <div style={{ maxWidth: 1000, width: "100%" }}>
+          <Typography variant="h4" component="h2">
+            Current Status
+          </Typography>
+          <Paper sx={{ padding: "1rem" }}>
+            <CurrentStatus />
+            <Divider sx={{ margin: "16px 0" }} />
+            <LightsDisabledMessage />
+            <Typography variant="h5" component="h3">
+              Current Set
+            </Typography>
+            <CurrentName />
+            <CurrentSetControls />
+            <Divider sx={{ margin: "16px 0" }} />
+            <Typography variant="h5" component="h3">
+              Current BPM
+            </Typography>
+            <CurrentBPM initialBpm={globals.BPM} />
+            <TapBPM />
+          </Paper>
+          <SetsList />
+          <CreateSet />
+        </div>
+      </WSProvider>
+    </GlobalsProvider>
   );
 };
 

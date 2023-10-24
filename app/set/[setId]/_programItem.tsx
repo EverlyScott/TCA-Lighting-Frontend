@@ -16,16 +16,16 @@ interface IProps {
 }
 
 const ProgramItem: React.FC<IProps> = ({ programItem, i, set, setSet, dragged, setDragged }) => {
-  const [delayedLength, setDelayedLength] = useState(programItem.length);
+  const [delayedLength, setDelayedLength] = useState(programItem.length.toString());
   const [delayedColor, setDelayedColor] = useState(programItem.rgb);
 
   const handleLengthChange: ChangeEventHandler<HTMLInputElement> = (evt) => {
-    setDelayedLength(parseFloat(evt.target.value));
+    setDelayedLength(evt.target.value);
   };
 
   const handleLengthUnfocus = () => {
     const newProgram = set.program;
-    newProgram[i].length = delayedLength;
+    newProgram[i].length = parseFloat(delayedLength);
     setSet({
       ...set,
       program: newProgram,
@@ -82,6 +82,7 @@ const ProgramItem: React.FC<IProps> = ({ programItem, i, set, setSet, dragged, s
         label="Length"
         value={delayedLength}
         type="number"
+        inputProps={{ inputMode: "decimal" }}
         onChange={handleLengthChange}
         onBlur={handleLengthUnfocus}
         sx={{ flexGrow: 1 }}
