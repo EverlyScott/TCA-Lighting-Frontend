@@ -6,13 +6,11 @@ import useCurrentHostname from "./useCurrentUrl";
 const getGlobals = async () => {
   const currentHostname = useCurrentHostname();
 
-  const globals = await axios.get<Globals>(`http://${currentHostname}:${config.api.port}/globals`);
+  const globals: Globals = await fetch(`http://${currentHostname}:${config.api.port}/globals`, {
+    cache: "no-cache",
+  }).then((res) => res.json());
 
-  if (globals.status === 200) {
-    return globals.data;
-  } else {
-    throw new Error(globals.statusText);
-  }
+  return globals;
 };
 
 export default getGlobals;
