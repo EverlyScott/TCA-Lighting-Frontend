@@ -41,7 +41,7 @@ interface IParams {
 const fetchSet = async (setId: string) => {
   const globals = await getGlobals();
 
-  const set = globals.SETS.find((set: Set) => set.id === setId);
+  const set = globals.SETS.find((set) => set.id === setId);
 
   if (set) {
     return set;
