@@ -292,6 +292,8 @@ const EditSet: NextPage<IProps> = ({ params }) => {
       set,
     });
 
+    setSubmitting(false);
+
     if (!res.data.success) {
       setToast({
         type: "error",
@@ -304,6 +306,7 @@ const EditSet: NextPage<IProps> = ({ params }) => {
 
   const handleSaveAndExit = async () => {
     await handleSave();
+    router.push("/");
   };
 
   const handleToggleMonaco = () => {
