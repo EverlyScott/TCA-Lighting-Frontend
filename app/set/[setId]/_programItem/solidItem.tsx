@@ -1,13 +1,23 @@
 "use client";
 
-import { IconButton, Paper, TextField, useTheme } from "@mui/material";
+import {
+  FormControl,
+  IconButton,
+  InputLabel,
+  MenuItem,
+  Paper,
+  Select,
+  SelectChangeEvent,
+  TextField,
+  useTheme,
+} from "@mui/material";
 import { MuiColorInput as ColorInput } from "mui-color-input";
-import { ProgramItem, Set } from "@/types";
-import { ChangeEventHandler, MouseEventHandler, useState } from "react";
+import { RGB, Set, SolidProgramItem as ISolidProgramItem, FadeProgramItem as IFadeProgramItem } from "@/types";
+import { ChangeEventHandler, MouseEventHandler, useEffect, useState } from "react";
 import { Delete, Menu } from "@mui/icons-material";
 
 interface IProps {
-  programItem: ProgramItem;
+  programItem: ISolidProgramItem;
   i: number;
   set: Set;
   setSet: React.Dispatch<React.SetStateAction<Set | undefined>>;
@@ -15,9 +25,10 @@ interface IProps {
   setDragged: React.Dispatch<React.SetStateAction<number | undefined>>;
 }
 
-const ProgramItem: React.FC<IProps> = ({ programItem, i, set, setSet, dragged, setDragged }) => {
+const SolidProgramItem: React.FC<IProps> = ({ programItem, i, set, setSet, dragged, setDragged }) => {
+  const [type, setType] = useState<"solid" | "fade">(programItem.type);
   const [delayedLength, setDelayedLength] = useState(programItem.length.toString());
-  const [delayedColor, setDelayedColor] = useState(programItem.rgb);
+  const [delayedColor, setDelayedColor] = useState<RGB>(programItem.rgb);
 
   const handleLengthChange: ChangeEventHandler<HTMLInputElement> = (evt) => {
     setDelayedLength(evt.target.value);
@@ -42,7 +53,7 @@ const ProgramItem: React.FC<IProps> = ({ programItem, i, set, setSet, dragged, s
 
   const handlePopoverClose = () => {
     const newProgram = set.program;
-    newProgram[i].rgb = delayedColor;
+    (newProgram[i] as ISolidProgramItem).rgb = delayedColor;
     setSet({
       ...set,
       program: newProgram,
@@ -52,6 +63,21 @@ const ProgramItem: React.FC<IProps> = ({ programItem, i, set, setSet, dragged, s
   const handleDelete = () => {
     const newProgram = set.program;
     newProgram.splice(i, 1);
+    setSet({
+      ...set,
+      program: newProgram,
+    });
+  };
+
+  const handleTypeChange = (evt: SelectChangeEvent<"solid" | "fade">) => {
+    const newProgramItem: IFadeProgramItem = {
+      type: "fade",
+      length: parseFloat(delayedLength),
+      from: delayedColor,
+      to: [0, 0, 0],
+    };
+    const newProgram = set.program;
+    newProgram[i] = newProgramItem;
     setSet({
       ...set,
       program: newProgram,
@@ -73,11 +99,16 @@ const ProgramItem: React.FC<IProps> = ({ programItem, i, set, setSet, dragged, s
         gap: "1rem",
       }}
     >
-      <div
-        style={{ marginLeft: ".5rem", display: "flex", justifyContent: "center", alignItems: "center", cursor: "grab" }}
-      >
-        <Menu onMouseDown={handleDrag} color="disabled" />
+      <div style={{ marginLeft: ".5rem", display: "flex", justifyContent: "center", alignItems: "center" }}>
+        <Menu sx={{ cursor: "grab" }} onMouseDown={handleDrag} color="disabled" />
       </div>
+      <FormControl sx={{ flex: "1 1 0" }}>
+        <InputLabel>Type</InputLabel>
+        <Select value={type} label="Type" onChange={handleTypeChange}>
+          <MenuItem value="solid">Solid</MenuItem>
+          <MenuItem value="fade">Fade</MenuItem>
+        </Select>
+      </FormControl>
       <TextField
         label="Length"
         value={delayedLength}
@@ -85,7 +116,7 @@ const ProgramItem: React.FC<IProps> = ({ programItem, i, set, setSet, dragged, s
         inputProps={{ inputMode: "decimal" }}
         onChange={handleLengthChange}
         onBlur={handleLengthUnfocus}
-        sx={{ flexGrow: 1 }}
+        sx={{ flex: "1 1 0" }}
       />
       <ColorInput
         label="Color"
@@ -98,7 +129,7 @@ const ProgramItem: React.FC<IProps> = ({ programItem, i, set, setSet, dragged, s
           .toString(16)
           .padStart(2, "0")}${delayedColor[2].toString(16).padStart(2, "0")}`}
         onChange={handleColorChange}
-        sx={{ flexGrow: 1 }}
+        sx={{ flex: "1 1 0" }}
       />
       <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
         <IconButton onClick={handleDelete} color="error" sx={{ aspectRatio: 1 / 1 }}>
@@ -109,4 +140,4 @@ const ProgramItem: React.FC<IProps> = ({ programItem, i, set, setSet, dragged, s
   );
 };
 
-export default ProgramItem;
+export default SolidProgramItem;

@@ -8,6 +8,8 @@ export interface ErrorPageProps {
 }
 export type ErrorPage = NextPage<ErrorPageProps>;
 
+export type RGB = [number, number, number];
+
 export interface Set {
   name: string;
   id: string;
@@ -18,8 +20,18 @@ export interface Set {
 
 export type Program = ProgramItem[];
 
-export interface ProgramItem {
-  rgb: [number, number, number];
+export type ProgramItem = FadeProgramItem | SolidProgramItem;
+
+export interface FadeProgramItem {
+  type: "fade";
+  from: RGB;
+  to: RGB;
+  length: number;
+}
+
+export interface SolidProgramItem {
+  type: "solid";
+  rgb: RGB;
   length: number;
 }
 

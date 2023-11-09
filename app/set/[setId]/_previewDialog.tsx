@@ -1,5 +1,5 @@
 import useColorScheme from "#/useColorScheme";
-import { Set } from "@/types";
+import { RGB, Set } from "@/types";
 import {
   Button,
   Dialog,
@@ -69,9 +69,22 @@ const PreviewDialog: React.FC<IProps> = ({ open, setOpen, set }) => {
       }
       const programItem = set.program[i];
 
-      setCurrentColor(programItem.rgb);
+      if (programItem.type === "solid") {
+        setCurrentColor(programItem.rgb);
 
-      await new Promise((resolve) => setTimeout(resolve, programItem.length * ((60 / set.initialBPM) * 1000)));
+        await new Promise((resolve) => setTimeout(resolve, programItem.length * ((60 / set.initialBPM) * 1000)));
+      } else if (programItem.type === "fade") {
+        for (let n = 0; n < programItem.length; n += 0.01) {
+          const currentPercent = n / programItem.length;
+          const color: RGB = [
+            Math.round(programItem.from[0] + (programItem.to[0] - programItem.from[0]) * currentPercent),
+            Math.round(programItem.from[1] + (programItem.to[1] - programItem.from[1]) * currentPercent),
+            Math.round(programItem.from[2] + (programItem.to[2] - programItem.from[2]) * currentPercent),
+          ];
+          setCurrentColor(color);
+          await new Promise((resolve) => setTimeout(resolve, programItem.length * (60 / set.initialBPM) * 10));
+        }
+      }
     }
 
     setPlaying(false);

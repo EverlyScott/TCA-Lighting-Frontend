@@ -13,12 +13,11 @@ import {
 } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { NextPage } from "next";
-import { Set } from "@/types";
+import { Set, SolidProgramItem as ISolidProgramItem, FadeProgramItem as IFadeProgramItem } from "@/types";
 import getGlobals from "#/getGlobals";
 import { ChangeEventHandler, useEffect, useMemo, useState } from "react";
 import Loading from "./loading";
 import config from "@/config.json";
-import ProgramItem from "./_programItem";
 import { Add, Brush, Code, CodeOff, PlayArrow } from "@mui/icons-material";
 import useColorScheme from "#/useColorScheme";
 import axios from "axios";
@@ -29,6 +28,8 @@ import { useToasts } from "@geist-ui/core";
 import useCurrentHostname from "#/useCurrentUrl";
 import PreviewDialog from "./_previewDialog";
 import CancelDialog from "./_cancelDialog";
+import SolidProgramItem from "./_programItem/solidItem";
+import FadeProgramItem from "./_programItem/fadeItem";
 
 interface IProps {
   params: IParams;
@@ -69,7 +70,7 @@ const EditSet: NextPage<IProps> = ({ params }) => {
   const currentHostname = useCurrentHostname();
   const monaco = useMonaco();
   const theme = useTheme();
-  const isMdDown = useMediaQuery(theme.breakpoints.down("md"));
+  const isLgDown = useMediaQuery(theme.breakpoints.down("lg"));
   const router = useRouter();
 
   const handleMouseMove = (evt: MouseEvent) => {
@@ -183,13 +184,38 @@ const EditSet: NextPage<IProps> = ({ params }) => {
               const programItem = set.program[i];
               const oldProgramItem = oldSet.program[i];
 
-              if (programItem.length !== oldProgramItem.length) {
+              if (programItem.type !== oldProgramItem.type) {
                 isEqual = false;
                 break;
-              } else {
+              } else if (programItem.type === "solid" && oldProgramItem.type === "solid") {
                 for (let c = 0; c < programItem.rgb.length; c++) {
                   const color = programItem.rgb[c];
                   const oldColor = oldProgramItem.rgb[c];
+
+                  if (color !== oldColor) {
+                    isEqual = false;
+                    break;
+                  }
+                }
+                if (!isEqual) {
+                  break;
+                }
+              } else if (programItem.type === "fade" && oldProgramItem.type === "fade") {
+                for (let c = 0; c < programItem.from.length; c++) {
+                  const color = programItem.from[c];
+                  const oldColor = oldProgramItem.from[c];
+
+                  if (color !== oldColor) {
+                    isEqual = false;
+                    break;
+                  }
+                }
+                if (!isEqual) {
+                  break;
+                }
+                for (let c = 0; c < programItem.to.length; c++) {
+                  const color = programItem.to[c];
+                  const oldColor = oldProgramItem.to[c];
 
                   if (color !== oldColor) {
                     isEqual = false;
@@ -271,6 +297,7 @@ const EditSet: NextPage<IProps> = ({ params }) => {
     if (set) {
       const newProgram = set.program;
       newProgram.push({
+        type: "solid",
         length: 1,
         rgb: [255, 255, 255],
       });
@@ -338,17 +365,29 @@ const EditSet: NextPage<IProps> = ({ params }) => {
                   boxShadow: "0px 0px 20px 2px rgba(0, 0, 0, 0.1)",
                 }}
               >
-                <ProgramItem
-                  programItem={set.program[dragged]}
-                  i={dragged}
-                  set={set}
-                  setSet={setSet}
-                  dragged={dragged}
-                  setDragged={setDragged}
-                />
+                {set.program[dragged].type === "solid" && (
+                  <SolidProgramItem
+                    programItem={set.program[dragged] as ISolidProgramItem}
+                    i={dragged}
+                    set={set}
+                    setSet={setSet}
+                    dragged={dragged}
+                    setDragged={setDragged}
+                  />
+                )}
+                {set.program[dragged].type === "fade" && (
+                  <FadeProgramItem
+                    programItem={set.program[dragged] as IFadeProgramItem}
+                    i={dragged}
+                    set={set}
+                    setSet={setSet}
+                    dragged={dragged}
+                    setDragged={setDragged}
+                  />
+                )}
               </div>
             )}
-            <div style={{ display: "flex", flexDirection: isMdDown ? "column" : "initial", gap: "1rem" }}>
+            <div style={{ display: "flex", flexDirection: isLgDown ? "column" : "initial", gap: "1rem" }}>
               <div
                 style={
                   showMonaco
@@ -423,7 +462,7 @@ const EditSet: NextPage<IProps> = ({ params }) => {
                                 margin: "8px",
                                 backgroundImage:
                                   "linear-gradient(rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.08))",
-                                height: 72,
+                                height: set.program[dragged].type === "solid" ? 72 : 144,
                                 overflow: "hidden",
                               }
                         }
@@ -432,15 +471,30 @@ const EditSet: NextPage<IProps> = ({ params }) => {
                         if (dragged !== i) {
                           return (
                             <>
-                              <ProgramItem
-                                key={`${i}${programItem.length}${programItem.rgb.join(",")}`}
-                                programItem={programItem}
-                                i={i}
-                                set={set}
-                                setSet={setSet}
-                                dragged={dragged}
-                                setDragged={setDragged}
-                              />
+                              {programItem.type === "solid" && (
+                                <SolidProgramItem
+                                  key={`${i}${programItem.length}${programItem.rgb.join(",")}`}
+                                  programItem={programItem}
+                                  i={i}
+                                  set={set}
+                                  setSet={setSet}
+                                  dragged={dragged}
+                                  setDragged={setDragged}
+                                />
+                              )}
+                              {programItem.type === "fade" && (
+                                <FadeProgramItem
+                                  key={`${i}${programItem.length}${programItem.from.join(",")}-${programItem.to.join(
+                                    ","
+                                  )}`}
+                                  programItem={programItem}
+                                  i={i}
+                                  set={set}
+                                  setSet={setSet}
+                                  dragged={dragged}
+                                  setDragged={setDragged}
+                                />
+                              )}
                               <Paper
                                 className="dropZone"
                                 style={
@@ -451,7 +505,7 @@ const EditSet: NextPage<IProps> = ({ params }) => {
                                         margin: "8px",
                                         backgroundImage:
                                           "linear-gradient(rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.08))",
-                                        height: 72,
+                                        height: set.program[dragged].type === "solid" ? 72 : 144,
                                         overflow: "hidden",
                                       }
                                 }
@@ -482,9 +536,9 @@ const EditSet: NextPage<IProps> = ({ params }) => {
                 <div
                   style={{
                     flex: 1,
-                    width: isMdDown ? "100%" : "50%",
-                    minWidth: isMdDown || showMonaco ? "initial" : "500px",
-                    height: isMdDown ? "auto" : "initial",
+                    width: isLgDown ? "100%" : "50%",
+                    minWidth: isLgDown || showMonaco ? "initial" : "500px",
+                    height: isLgDown ? "auto" : "initial",
                     display: "flex",
                     flexDirection: "column-reverse",
                   }}

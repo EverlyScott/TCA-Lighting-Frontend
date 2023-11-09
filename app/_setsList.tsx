@@ -87,8 +87,6 @@ const SetsList: React.FC = () => {
 
   useEffect(() => {
     const handleMouseUp = async (evt: MouseEvent) => {
-      console.log(!!globals, draggedIndex, activeDropZone);
-
       if (globals && draggedIndex !== undefined && activeDropZone !== undefined) {
         evt.preventDefault();
         const reorderedList = reorderList([...globals.SETS], draggedIndex, activeDropZone);

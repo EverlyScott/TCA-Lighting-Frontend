@@ -57,7 +57,6 @@ const MonacoEditor: React.FC<IProps> = ({ value, setValue, initialLoad, setIniti
         },
 
         provideDocumentColors(model, token) {
-          /"rgb":[\\S]*([\\S\\s]*?\\],)/g;
           const matches = model.findMatches(
             `"rgb":[\\s]*\\[[\\s\\n]*[0-9]{1,3}[\\s]?,[\\S\\n]*[\\s\\n]*[0-9]{1,3}[\\s]?,[\\S\\n]*[\\s\\n]*[0-9]{1,3}[\\s]*[\\S\\n]*\\]`,
             true,
@@ -73,6 +72,94 @@ const MonacoEditor: React.FC<IProps> = ({ value, setValue, initialLoad, setIniti
             const match = matches[i];
 
             const { rgb }: { rgb: [number, number, number] } = JSON.parse(`{${match.matches?.[0] ?? `[0, 0, 0]`}}`);
+
+            colors.push({
+              color: {
+                red: rgb[0] / 255,
+                green: rgb[1] / 255,
+                blue: rgb[2] / 255,
+                alpha: 1,
+              },
+              range: match.range,
+            });
+          }
+
+          return colors;
+        },
+      });
+
+      monaco.languages.registerColorProvider("json", {
+        provideColorPresentations: (_, colorInfo) => {
+          return [
+            {
+              label: `"from": [${colorInfo.color.red * 255}, ${colorInfo.color.green * 255}, ${
+                colorInfo.color.blue * 255
+              }]`,
+            },
+          ];
+        },
+
+        provideDocumentColors(model, token) {
+          const matches = model.findMatches(
+            `"from":[\\s]*\\[[\\s\\n]*[0-9]{1,3}[\\s]?,[\\S\\n]*[\\s\\n]*[0-9]{1,3}[\\s]?,[\\S\\n]*[\\s\\n]*[0-9]{1,3}[\\s]*[\\S\\n]*\\]`,
+            true,
+            true,
+            true,
+            null,
+            true
+          );
+
+          let colors: languages.ProviderResult<languages.IColorInformation[]> = [];
+
+          for (let i = 0; i < matches.length; i++) {
+            const match = matches[i];
+
+            const { from: rgb }: { from: [number, number, number] } = JSON.parse(
+              `{${match.matches?.[0] ?? `[0, 0, 0]`}}`
+            );
+
+            colors.push({
+              color: {
+                red: rgb[0] / 255,
+                green: rgb[1] / 255,
+                blue: rgb[2] / 255,
+                alpha: 1,
+              },
+              range: match.range,
+            });
+          }
+
+          return colors;
+        },
+      });
+
+      monaco.languages.registerColorProvider("json", {
+        provideColorPresentations: (_, colorInfo) => {
+          return [
+            {
+              label: `"to": [${colorInfo.color.red * 255}, ${colorInfo.color.green * 255}, ${
+                colorInfo.color.blue * 255
+              }]`,
+            },
+          ];
+        },
+
+        provideDocumentColors(model, token) {
+          const matches = model.findMatches(
+            `"to":[\\s]*\\[[\\s\\n]*[0-9]{1,3}[\\s]?,[\\S\\n]*[\\s\\n]*[0-9]{1,3}[\\s]?,[\\S\\n]*[\\s\\n]*[0-9]{1,3}[\\s]*[\\S\\n]*\\]`,
+            true,
+            true,
+            true,
+            null,
+            true
+          );
+
+          let colors: languages.ProviderResult<languages.IColorInformation[]> = [];
+
+          for (let i = 0; i < matches.length; i++) {
+            const match = matches[i];
+
+            const { to: rgb }: { to: [number, number, number] } = JSON.parse(`{${match.matches?.[0] ?? `[0, 0, 0]`}}`);
 
             colors.push({
               color: {
@@ -115,21 +202,58 @@ const MonacoEditor: React.FC<IProps> = ({ value, setValue, initialLoad, setIniti
             invalid = true;
             break;
           }
-          if (programItem.rgb && (typeof programItem.rgb !== "object" || programItem.rgb.length <= 0)) {
-            invalid = true;
-            break;
-          }
-
-          for (let c = 0; c < programItem.rgb.length; c++) {
-            const color = programItem.rgb[c];
-
-            if (typeof color !== "number" || color > 255 || color < 0) {
+          if (programItem.type === "solid") {
+            if (programItem.rgb && (typeof programItem.rgb !== "object" || programItem.rgb.length <= 0)) {
               invalid = true;
               break;
             }
+
+            for (let c = 0; c < programItem.rgb.length; c++) {
+              const color = programItem.rgb[c];
+
+              if (typeof color !== "number" || color > 255 || color < 0) {
+                invalid = true;
+                break;
+              }
+            }
+            if (invalid) {
+              break;
+            }
           }
-          if (invalid) {
-            break;
+          if (programItem.type === "fade") {
+            if (programItem.from && (typeof programItem.from !== "object" || programItem.from.length <= 0)) {
+              invalid = true;
+              break;
+            }
+
+            for (let c = 0; c < programItem.from.length; c++) {
+              const color = programItem.from[c];
+
+              if (typeof color !== "number" || color > 255 || color < 0) {
+                invalid = true;
+                break;
+              }
+            }
+            if (invalid) {
+              break;
+            }
+
+            if (programItem.to && (typeof programItem.to !== "object" || programItem.to.length <= 0)) {
+              invalid = true;
+              break;
+            }
+
+            for (let c = 0; c < programItem.to.length; c++) {
+              const color = programItem.to[c];
+
+              if (typeof color !== "number" || color > 255 || color < 0) {
+                invalid = true;
+                break;
+              }
+            }
+            if (invalid) {
+              break;
+            }
           }
         }
 
@@ -175,7 +299,7 @@ const MonacoEditor: React.FC<IProps> = ({ value, setValue, initialLoad, setIniti
         defaultValue={JSON.stringify(value, null, 2)}
         options={{ tabSize: 2, minimap: { enabled: false }, wordWrap: "on" }}
         onChange={handleChange}
-        path={`http://${currentHostname}:${config.frontend.port}`}
+        path={`http://${currentHostname}:${config.api.port}`}
       />
     </div>
   );
